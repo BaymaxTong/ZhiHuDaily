@@ -25,6 +25,7 @@ dependencies {
     compile 'com.android.support:recyclerview-v7:22.2.1'
     compile 'com.android.support:cardview-v7:22.2.1'
     compile 'com.android.support:support-v4:22.2.1'
+    compile 'com.android.support:design:22.2.1'
     compile 'com.nostra13.universalimageloader:universal-image-loader:1.9.4'
     compile files('libs/volly-1.0.11.jar')
     compile files('libs/gson-2.2.4.jar')

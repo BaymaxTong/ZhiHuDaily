@@ -1,5 +1,6 @@
 package com.rutong.zhihudaily.ui.fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -33,8 +34,10 @@ import com.rutong.zhihudaily.net.RequestImage;
 import com.rutong.zhihudaily.net.RequestImageLoader;
 import com.rutong.zhihudaily.net.RequestManager;
 import com.rutong.zhihudaily.net.RequestNews;
+import com.rutong.zhihudaily.ui.NewsContentActivity;
 import com.rutong.zhihudaily.view.Kanner;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
@@ -63,8 +66,11 @@ public class NewsFragment extends Fragment {
         kanner.setOnItemClickListener(new Kanner.OnItemClickListener() {
             @Override
             public void click(View v, TopStories stories) {
-                Toast.makeText(getActivity(), stories.getTitle(), Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getActivity(), stories.getTitle(), Toast.LENGTH_SHORT).show();
                 //点击跳转
+                Intent intent = new Intent(getActivity(), NewsContentActivity.class);
+                intent.putExtra("id", stories.getId()+"");
+                startActivity(intent);
             }
         });
         newsAdapter.setHeaderView(header);
@@ -133,7 +139,7 @@ public class NewsFragment extends Fragment {
         }
 
         @Override
-        public void onBind(RecyclerView.ViewHolder viewHolder, int RealPosition, Stories data) {
+        public void onBind(RecyclerView.ViewHolder viewHolder, int RealPosition, final Stories data) {
             if(viewHolder instanceof timeHolder){
                 ((timeHolder)viewHolder).getTimeTextView().setText("今日热文");
                 ((timeHolder)viewHolder).getTextView().setText(data.getTitle());
@@ -142,6 +148,9 @@ public class NewsFragment extends Fragment {
                     @Override
                     public void onClick(View v) {
                         //跳转 webView
+                        Intent intent = new Intent(getActivity(), NewsContentActivity.class);
+                        intent.putExtra("id", data.getId()+"");
+                        startActivity(intent);
                     }
                 });
             }
@@ -152,6 +161,9 @@ public class NewsFragment extends Fragment {
                     @Override
                     public void onClick(View v) {
                         //跳转 webView
+                        Intent intent = new Intent(getActivity(), NewsContentActivity.class);
+                        intent.putExtra("id", data.getId()+"");
+                        startActivity(intent);
                     }
                 });
             }

@@ -1,6 +1,7 @@
 package com.rutong.zhihudaily.ui.fragment;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
@@ -28,6 +29,7 @@ import com.rutong.zhihudaily.net.RequestImageLoader;
 import com.rutong.zhihudaily.net.RequestManager;
 import com.rutong.zhihudaily.net.RequestNews;
 import com.rutong.zhihudaily.ui.MainActivity;
+import com.rutong.zhihudaily.ui.NewsContentActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -146,7 +148,7 @@ public class ThemesFragment extends Fragment {
         }
 
         @Override
-        public void onBind(RecyclerView.ViewHolder viewHolder, int RealPosition, Stories data) {
+        public void onBind(RecyclerView.ViewHolder viewHolder, int RealPosition, final Stories data) {
             if(viewHolder instanceof myViewHolder){
                 ((myViewHolder)viewHolder).getTextView().setText(data.getTitle());
                 //((myViewHolder)viewHolder).getImageView().setImageResource(R.mipmap.ic_launcher);
@@ -155,6 +157,9 @@ public class ThemesFragment extends Fragment {
                     @Override
                     public void onClick(View v) {
                         //跳转 webView
+                        Intent intent = new Intent(getActivity(), NewsContentActivity.class);
+                        intent.putExtra("id", data.getId()+"");
+                        startActivity(intent);
                     }
                 });
             }
@@ -164,6 +169,9 @@ public class ThemesFragment extends Fragment {
                     @Override
                     public void onClick(View v) {
                         //跳转 webView
+                        Intent intent = new Intent(getActivity(), NewsContentActivity.class);
+                        intent.putExtra("id", data.getId()+"");
+                        startActivity(intent);
                     }
                 });
             }
