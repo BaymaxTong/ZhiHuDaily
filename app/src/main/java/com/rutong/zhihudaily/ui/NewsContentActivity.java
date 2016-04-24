@@ -12,6 +12,8 @@ import android.widget.Toast;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.rutong.zhihudaily.R;
+import com.rutong.zhihudaily.base.MyApplication;
+import com.rutong.zhihudaily.db.NewsContentCacheUtil;
 import com.rutong.zhihudaily.model.Menu;
 import com.rutong.zhihudaily.model.NewsContent;
 import com.rutong.zhihudaily.net.RequestManager;
@@ -24,6 +26,7 @@ public class NewsContentActivity extends AppCompatActivity {
     private CoordinatorLayout coordinatorLayout;
     private WebView mWebView;
     private String storiesID;
+    private String testId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +59,8 @@ public class NewsContentActivity extends AppCompatActivity {
                 html = html.replace("<div class=\"img-place-holder\">", "");
                 //Log.d("html",html);
                 mWebView.loadDataWithBaseURL("x-data://base", html, "text/html", "UTF-8", null);
+                //加载完毕后缓存
+
             }
         }, new Response.ErrorListener() {
             @Override
