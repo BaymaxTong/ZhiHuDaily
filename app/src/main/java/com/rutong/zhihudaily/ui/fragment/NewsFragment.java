@@ -15,6 +15,8 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -25,6 +27,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.rutong.zhihudaily.R;
 import com.rutong.zhihudaily.base.BaseRecyclerAdapter;
+import com.rutong.zhihudaily.model.Before;
 import com.rutong.zhihudaily.model.Menu;
 import com.rutong.zhihudaily.model.News;
 import com.rutong.zhihudaily.model.Stories;
@@ -38,7 +41,10 @@ import com.rutong.zhihudaily.ui.NewsContentActivity;
 import com.rutong.zhihudaily.view.Kanner;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
 /**
  * Created by baymax on 2015/12/7.
@@ -46,9 +52,10 @@ import java.util.ArrayList;
 public class NewsFragment extends Fragment {
     private SwipeRefreshLayout swipeRefreshLayout;
     private RecyclerView recyclerView;
-    private RecyclerView.LayoutManager layoutManager;
+    private LinearLayoutManager layoutManager;
     private NewsAdapter newsAdapter;
     private Kanner kanner;
+    private int data = 0;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -69,7 +76,7 @@ public class NewsFragment extends Fragment {
                 //Toast.makeText(getActivity(), stories.getTitle(), Toast.LENGTH_SHORT).show();
                 //点击跳转
                 Intent intent = new Intent(getActivity(), NewsContentActivity.class);
-                intent.putExtra("id", stories.getId()+"");
+                intent.putExtra("id", stories.getId() + "");
                 startActivity(intent);
             }
         });
@@ -81,7 +88,7 @@ public class NewsFragment extends Fragment {
                 @Override
                 public void onResponse(News news) {
                     ArrayList<Stories> stories = news.getStories();
-                    for(int i = 0;i<stories.size();i++) {
+                    for (int i = 0; i < stories.size(); i++) {
                         newsAdapter = new NewsAdapter();
                         recyclerView.setAdapter(newsAdapter);
                         newsAdapter.addDatas(stories);
@@ -94,9 +101,30 @@ public class NewsFragment extends Fragment {
             }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError volleyError) {
-
+                    //error
                 }
             }), "News");
+    }
+
+    private void loadMore(String id) {
+        RequestManager.addRequest(new RequestNews<Before>(Menu.URL_Before + id, Before.class, new Response.Listener<Before>() {
+            @Override
+            public void onResponse(Before before) {
+                before.getStories();
+                ArrayList<Stories> stories = before.getStories();
+                for(int i = 0;i<stories.size();i++) {
+//                    newsAdapter = new NewsAdapter();
+//                    recyclerView.setAdapter(newsAdapter);
+                    newsAdapter.addDatas(stories);
+                }
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+                //error
+            }
+        }), "Before");
     }
 
     private void initView(View view) {
@@ -118,6 +146,48 @@ public class NewsFragment extends Fragment {
                 swipeRefreshLayout.setRefreshing(false);
             }
         });
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+                switch (newState) {
+                    case RecyclerView.SCROLL_STATE_SETTLING:
+                        //用户在手指离开屏幕之前，由于滑了一下，视图仍然依靠惯性继续滑动
+                        //刷新
+                        break;
+                    case RecyclerView.SCROLL_STATE_IDLE:
+                        //视图已经停止滑动
+//                    }
+                        break;
+                    case RecyclerView.SCROLL_STATE_DRAGGING:
+                        //手指没有离开屏幕，视图正在滑动
+                        break;
+                }
+            }
+
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                int visible = layoutManager.getChildCount();
+                int total = layoutManager.getItemCount();
+                int past = layoutManager.findFirstCompletelyVisibleItemPosition();
+                if ((visible + past) >= total) {
+                    //加载更多
+                    loadMore(getdate(--data));
+                }
+            }
+        });
+    }
+
+    public String getdate(int i) // //获取前后日期 i为正数 向后推迟i天，负数时向前提前i天
+    {
+        Date dat = null;
+        Calendar cd = Calendar.getInstance();
+        cd.add(Calendar.DATE, i);
+        dat = cd.getTime();
+        SimpleDateFormat dformat = new SimpleDateFormat("yyyyMMdd");
+        String date = String.valueOf(dformat.format(dat));
+        return date;
     }
 
     private ActionBar getActionBar() {
@@ -127,6 +197,16 @@ public class NewsFragment extends Fragment {
     private class NewsAdapter extends BaseRecyclerAdapter<Stories>{
         public static final int TYPE_TIME = 1;
         public static final int TYPE_NORMAL = 2;
+        private int lastPosition = -1;
+
+        private void setAnimation(View viewToAnimate, int position) {
+            if (position > lastPosition) {
+                Animation animation = AnimationUtils.loadAnimation(viewToAnimate.getContext(), R
+                        .anim.item_bottom_in);
+                viewToAnimate.startAnimation(animation);
+                lastPosition = position;
+            }
+        }
 
         @Override
         public RecyclerView.ViewHolder onCreate(ViewGroup parent, int viewType) {
@@ -149,10 +229,11 @@ public class NewsFragment extends Fragment {
                     public void onClick(View v) {
                         //跳转 webView
                         Intent intent = new Intent(getActivity(), NewsContentActivity.class);
-                        intent.putExtra("id", data.getId()+"");
+                        intent.putExtra("id", data.getId() + "");
                         startActivity(intent);
                     }
                 });
+                //setAnimation(((timeHolder) viewHolder).cardView, RealPosition);
             }
             if(viewHolder instanceof itemHolder){
                 ((itemHolder)viewHolder).getTextView().setText(data.getTitle());
@@ -162,10 +243,11 @@ public class NewsFragment extends Fragment {
                     public void onClick(View v) {
                         //跳转 webView
                         Intent intent = new Intent(getActivity(), NewsContentActivity.class);
-                        intent.putExtra("id", data.getId()+"");
+                        intent.putExtra("id", data.getId() + "");
                         startActivity(intent);
                     }
                 });
+                //setAnimation(((itemHolder) viewHolder).linearLayout, RealPosition);
             }
         }
 
@@ -182,8 +264,12 @@ public class NewsFragment extends Fragment {
             private TextView textView;
             private ImageView imageView;
             private LinearLayout linearLayout;
+            //用于处理多次点击造成的网络访问
+            private boolean isClickFinish;
+
             public itemHolder(View itemView) {
                 super(itemView);
+                isClickFinish = true;
                 textView = (TextView) itemView.findViewById(R.id.tv_news_item);
                 imageView = (ImageView) itemView.findViewById(R.id.iv_news_item);
                 linearLayout = (LinearLayout) itemView.findViewById(R.id.news_item_layout);
@@ -201,8 +287,12 @@ public class NewsFragment extends Fragment {
             private TextView textView;
             private ImageView imageView;
             private CardView cardView;
+            //用于处理多次点击造成的网络访问
+            private boolean isClickFinish;
+
             public timeHolder(View itemView) {
                 super(itemView);
+                isClickFinish = true;
                 time = (TextView) itemView.findViewById(R.id.tv_news_time);
                 textView = (TextView) itemView.findViewById(R.id.tv_news_item_time);
                 imageView = (ImageView) itemView.findViewById(R.id.iv_news_item_time);

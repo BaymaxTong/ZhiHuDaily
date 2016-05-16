@@ -21,6 +21,7 @@ public class Menu implements Serializable{
     public static final String URL_Themes = "http://news-at.zhihu.com/api/4/themes";
     public static final String URL_Theme = "http://news-at.zhihu.com/api/4/theme/";    //remember add id
     public static final String URL_News = "http://news-at.zhihu.com/api/4/news/";      //remember add id
+    public static final String URL_Before = "http://news.at.zhihu.com/api/4/news/before/";//remember add id
 
     //该主题日报的编号
     private String id;

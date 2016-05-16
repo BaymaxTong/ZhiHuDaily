@@ -4,7 +4,6 @@ import android.graphics.Bitmap;
 import android.util.LruCache;
 
 import com.android.volley.toolbox.ImageLoader;
-import com.rutong.zhihudaily.utils.CircleImageUtil;
 
 /**
  * Created by baymax on 2016/1/20.

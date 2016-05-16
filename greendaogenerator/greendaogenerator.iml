@@ -30,5 +30,6 @@
     <orderEntry type="library" exported="" name="greendao-generator-2.1.0" level="project" />
     <orderEntry type="library" exported="" name="freemarker-2.3.23" level="project" />
     <orderEntry type="library" exported="" name="E__android_ZhiHuDaily_greendaogenerator_libs_greendao_1_3_0_beta_1_jar" level="project" />
+    <orderEntry type="library" exported="" name="greendaogenerator.greendaogenerator" level="project" />
   </component>
 </module>
